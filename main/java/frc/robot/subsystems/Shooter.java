@@ -1,50 +1,56 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkFlex;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
-import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
 
 public class Shooter extends SubsystemBase implements AutoCloseable {
-  private final CANSparkFlex topMotor;
-  private final CANSparkFlex middleMotor;
-  private final CANSparkFlex bottomMotor;
+  private final SparkFlex topMotor;
+  private final SparkFlex middleMotor;
+  private final SparkFlex bottomMotor;
 
   private final RelativeEncoder topEncoder;
-  private final SparkPIDController topPid;
+  private final SparkClosedLoopController topPid;
 
   public Shooter() {
-    topMotor = new CANSparkFlex(ShooterConstants.TOP_MOTOR_ID, MotorType.kBrushless);
-    middleMotor = new CANSparkFlex(ShooterConstants.MIDDLE_MOTOR_ID, MotorType.kBrushless);
-    bottomMotor = new CANSparkFlex(ShooterConstants.BOTTOM_MOTOR_ID, MotorType.kBrushless);
+    topMotor = new SparkFlex(ShooterConstants.TOP_MOTOR_ID, MotorType.kBrushless);
+    middleMotor = new SparkFlex(ShooterConstants.MIDDLE_MOTOR_ID, MotorType.kBrushless);
+    bottomMotor = new SparkFlex(ShooterConstants.BOTTOM_MOTOR_ID, MotorType.kBrushless);
 
-    topMotor.restoreFactoryDefaults();
-    middleMotor.restoreFactoryDefaults();
-    bottomMotor.restoreFactoryDefaults();
+    SparkFlexConfig topConfig = new SparkFlexConfig();
+    topConfig.idleMode(IdleMode.kCoast);
+    topConfig.smartCurrentLimit(ShooterConstants.CURRENT_LIMIT_AMPS);
+    topConfig.inverted(ShooterConstants.TOP_INVERTED);
+    topConfig.closedLoop.pidf(
+        ShooterConstants.KP,
+        ShooterConstants.KI,
+        ShooterConstants.KD,
+        ShooterConstants.KF);
+    topMotor.configure(topConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    topMotor.setIdleMode(IdleMode.kCoast);
-    middleMotor.setIdleMode(IdleMode.kCoast);
-    bottomMotor.setIdleMode(IdleMode.kCoast);
+    SparkFlexConfig middleConfig = new SparkFlexConfig();
+    middleConfig.idleMode(IdleMode.kCoast);
+    middleConfig.smartCurrentLimit(ShooterConstants.CURRENT_LIMIT_AMPS);
+    middleConfig.follow(topMotor, ShooterConstants.MIDDLE_INVERTED);
+    middleMotor.configure(middleConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    topMotor.setSmartCurrentLimit(ShooterConstants.CURRENT_LIMIT_AMPS);
-    middleMotor.setSmartCurrentLimit(ShooterConstants.CURRENT_LIMIT_AMPS);
-    bottomMotor.setSmartCurrentLimit(ShooterConstants.CURRENT_LIMIT_AMPS);
-
-    topMotor.setInverted(ShooterConstants.TOP_INVERTED);
-    middleMotor.follow(topMotor, ShooterConstants.MIDDLE_INVERTED);
-    bottomMotor.follow(topMotor, ShooterConstants.BOTTOM_INVERTED);
+    SparkFlexConfig bottomConfig = new SparkFlexConfig();
+    bottomConfig.idleMode(IdleMode.kCoast);
+    bottomConfig.smartCurrentLimit(ShooterConstants.CURRENT_LIMIT_AMPS);
+    bottomConfig.follow(topMotor, ShooterConstants.BOTTOM_INVERTED);
+    bottomMotor.configure(bottomConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     topEncoder = topMotor.getEncoder();
-    topPid = topMotor.getPIDController();
-    topPid.setP(ShooterConstants.KP);
-    topPid.setI(ShooterConstants.KI);
-    topPid.setD(ShooterConstants.KD);
-    topPid.setFF(ShooterConstants.KF);
+    topPid = topMotor.getClosedLoopController();
   }
 
   public void stop() {
