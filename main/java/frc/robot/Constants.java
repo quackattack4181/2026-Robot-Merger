@@ -71,12 +71,12 @@ public final class Constants
 
   public static final class ShooterConstants
   {
-    public static final int TOP_MOTOR_ID = 31;
-    public static final int MIDDLE_MOTOR_ID = 32;
-    public static final int BOTTOM_MOTOR_ID = 33;
+    public static final int TOP_MOTOR_ID = 20;
+    public static final int MIDDLE_MOTOR_ID = 21;
+    public static final int BOTTOM_MOTOR_ID = 22;
 
     public static final boolean TOP_INVERTED = false;
-    public static final boolean MIDDLE_INVERTED = false;
+    public static final boolean MIDDLE_INVERTED = true;
     public static final boolean BOTTOM_INVERTED = false;
 
     public static final int CURRENT_LIMIT_AMPS = 40;
