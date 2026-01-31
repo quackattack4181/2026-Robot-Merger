@@ -68,4 +68,24 @@ public final class Constants
 
 
   }
+
+  public static final class ShooterConstants
+  {
+    public static final int TOP_MOTOR_ID = 31;
+    public static final int MIDDLE_MOTOR_ID = 32;
+    public static final int BOTTOM_MOTOR_ID = 33;
+
+    public static final boolean TOP_INVERTED = false;
+    public static final boolean MIDDLE_INVERTED = false;
+    public static final boolean BOTTOM_INVERTED = false;
+
+    public static final int CURRENT_LIMIT_AMPS = 40;
+    public static final double SHOOTER_RPM = 4500.0;
+    public static final double VELOCITY_TOLERANCE_RPM = 150.0;
+
+    public static final double KP = 0.00025;
+    public static final double KI = 0.0;
+    public static final double KD = 0.0;
+    public static final double KF = 0.00018;
+  }
 }
